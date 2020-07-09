@@ -1,5 +1,3 @@
-import sys
-sys.path.append('/home/ng213/pazy_code/pazy-model/')
 from pazy_wing_model import PazyWing
 import numpy as np
 import configobj
