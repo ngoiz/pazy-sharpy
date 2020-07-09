@@ -139,7 +139,10 @@ cython_debug/
 
 # SHARPy case files
 .h5
-cases/*
+.vtu
+.sharpy
+.log
+cases/
 
 # SHARPy output files
-output/*
+output/
