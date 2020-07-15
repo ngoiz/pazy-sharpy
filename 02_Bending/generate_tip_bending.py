@@ -22,8 +22,10 @@ def run_bending_simulation(case_id, tip_load, skin_on, case_root='./cases/', out
     pazy.generate_structure()
 
     # Lumped mass
-    pazy.structure.add_lumped_mass((tip_load/2, pazy.structure.n_node - 1))
-    pazy.structure.add_lumped_mass((tip_load/2, pazy.structure.n_node - 2))
+    mid_chord_b = - (pazy.get_ea_reference_line() - 0.5) * 0.1
+
+    pazy.structure.add_lumped_mass((tip_load, pazy.structure.n_node - 1, np.zeros((3, 3)),
+                                    np.array([0, mid_chord_b, 0])))
 
     pazy.save_files()
 
@@ -59,7 +61,7 @@ def run_bending_simulation(case_id, tip_load, skin_on, case_root='./cases/', out
     settings['BeamPlot'] = {'folder': output_folder}
 
     settings['WriteVariablesTime'] = {'folder': output_folder,
-                                       'structure_variables': ['pos'],
+                                       'structure_variables': ['pos', 'psi'],
                                        'structure_nodes': list(range(0, pazy.structure.n_node)),
                                        'cleanup_old_solution': 'on'}
 
@@ -87,14 +89,16 @@ def run_coupled_bending_simulation(case_id, tip_load, skin_on, case_root='./case
     if not os.path.isdir(case_route):
         os.makedirs(case_route, exist_ok=True)
 
-
     pazy = PazyWing(case_name, case_route, pazy_settings)
     pazy.generate_structure()
     pazy.structure.mirror_wing()
     pazy.generate_aero()
 
     # Lumped mass
-    pazy.structure.add_lumped_mass((tip_load, pazy.structure.n_node//2))
+    mid_chord_b = - (pazy.get_ea_reference_line() - 0.5) * 0.1
+
+    pazy.structure.add_lumped_mass((tip_load, pazy.structure.n_node//2, np.zeros((3, 3)),
+                                    np.array([0, mid_chord_b, 0])))
 
     pazy.save_files()
 
@@ -109,6 +113,7 @@ def run_coupled_bending_simulation(case_id, tip_load, skin_on, case_root='./case
                  'StaticCoupled',
                  'BeamPlot',
                  'WriteVariablesTime',
+                 'AerogridPlot',
                  ],
         'case': case_name, 'route': case_route,
         'write_screen': 'off', 'write_log': 'on',
@@ -164,10 +169,14 @@ def run_coupled_bending_simulation(case_id, tip_load, skin_on, case_root='./case
     settings['BeamPlot'] = {'folder': output_folder}
 
     settings['WriteVariablesTime'] = {'folder': output_folder,
-                                      'structure_variables': ['pos'],
+                                      'structure_variables': ['pos', 'psi'],
                                       'structure_nodes': list(range(0, pazy.structure.n_node)),
                                       'cleanup_old_solution': 'on'}
 
+    settings['AerogridPlot'] = {'folder': output_folder,
+                                   'include_rbm': 'off',
+                                   'include_applied_forces': 'on',
+                                   'minus_m_star': 0}
     for k, v in settings.items():
         config[k] = v
 
