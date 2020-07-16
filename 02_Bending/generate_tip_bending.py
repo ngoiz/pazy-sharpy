@@ -95,7 +95,7 @@ def run_coupled_bending_simulation(case_id, tip_load, skin_on, case_root='./case
     pazy.generate_aero()
 
     # Lumped mass
-    mid_chord_b = - (pazy.get_ea_reference_line() - 0.5) * 0.1
+    mid_chord_b = (pazy.get_ea_reference_line() - 0.5) * 0.1
 
     pazy.structure.add_lumped_mass((tip_load, pazy.structure.n_node//2, np.zeros((3, 3)),
                                     np.array([0, mid_chord_b, 0])))
@@ -189,7 +189,7 @@ def run_coupled_bending_simulation(case_id, tip_load, skin_on, case_root='./case
 
 if __name__ == '__main__':
     tip_load = np.linspace(0, 3.5, 25)
-    skin = 'off'
+    skin = 'on'
 
     for case_id in range(len(tip_load)):
         print('Running case {}, tip_load {}'.format(case_id, tip_load[case_id]))
