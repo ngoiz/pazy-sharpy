@@ -46,6 +46,7 @@ def generate_pazy(u_inf, case_name, output_folder='/output/', cases_subfolder=''
              'AerogridPlot',
              'BeamPlot',
              'WriteVariablesTime',
+             'DynamicCoupled',
              'Modal',
              'LinearAssembler',
              'AsymptoticStability',
@@ -168,9 +169,9 @@ def generate_pazy(u_inf, case_name, output_folder='/output/', cases_subfolder=''
                                                             'remove_sym_modes': 'on',
                                                             'remove_dofs': []},
                                           'aero_settings': {'dt': dt,
-                                                            'ScalingDict': {'length': 0.5 * pazy.aero.main_chord,
-                                                                            'speed': u_inf,
-                                                                            'density': rho},
+#                                                             'ScalingDict': {'length': 0.5 * pazy.aero.main_chord,
+#                                                                             'speed': u_inf,
+#                                                                             'density': rho},
                                                             'integr_order': 2,
                                                             'density': rho,
                                                             'remove_predictor': 'off',
@@ -202,73 +203,67 @@ def generate_pazy(u_inf, case_name, output_folder='/output/', cases_subfolder=''
     pazy.config['SaveParametricCase'] = {'folder': route_test_dir + output_folder + pazy.case_name + '/',
                                        'save_case': 'off',
                                        'parameters': {'u_inf': u_inf}}
-    # settings = dict()
-    # settings['NonLinearDynamicPrescribedStep'] = {'print_info': 'on',
-    #                                               'max_iterations': 950,
-    #                                               'delta_curved': 1e-2,
-    #                                               'min_delta': 1e-5,
-    #                                               'newmark_damp': 5e-2,
-    #                                               'gravity_on': 'on',
-    #                                               'gravity': 9.81,
-    #                                               'num_steps': pazy.n_tstep,
-    #                                               'dt': pazy.dt}
-    #
-    # settings['StepUvlm'] = {'print_info': 'on',
-    #                         'horseshoe': 'off',
-    #                         'num_cores': 4,
-    #                         'n_rollup': 100,
-    #                         'convection_scheme': 2,
-    #                         'rollup_dt': pazy.dt,
-    #                         'rollup_aic_refresh': 1,
-    #                         'rollup_tolerance': 1e-4,
-    #                         'velocity_field_generator': 'SteadyVelocityField',
-    #                         'velocity_field_input': {'u_inf': pazy.u_inf*1,
-    #                                                  'u_inf_direction': [1., 0., 0.]},
-    #                         'rho': pazy.rho,
-    #                         'n_time_steps': pazy.n_tstep,
-    #                         'dt': pazy.dt,
-    #                         'gamma_dot_filtering': 3}
+    settings = dict()
+    settings['NonLinearDynamicPrescribedStep'] = {'print_info': 'on',
+                                                  'max_iterations': 950,
+                                                  'delta_curved': 1e-6,
+                                                  'min_delta': 1e-8,
+                                                  'newmark_damp': 5e-4,
+                                                  'gravity_on': 'on',
+                                                  'gravity': 9.81,
+                                                  'num_steps': 1,
+                                                  'dt': dt}
+    
+    settings['StepUvlm'] = {'print_info': 'on',
+                            'horseshoe': 'off',
+                            'num_cores': 4,
+                            'n_rollup': 100,
+                            'convection_scheme': 2,
+                            'rollup_dt': dt,
+                            'rollup_aic_refresh': 1,
+                            'rollup_tolerance': 1e-4,
+                            'velocity_field_generator': 'SteadyVelocityField',
+                            'velocity_field_input': {'u_inf': u_inf,
+                                                     'u_inf_direction': [1., 0., 0.]},
+                            'rho': rho,
+                            'n_time_steps': 1,
+                            'dt': dt,
+                            'gamma_dot_filtering': 3,
+                           'vortex_radius': 1e-10}
 
-    # settings['DynamicCoupled'] = {'print_info': 'on',
-    #                               'structural_substeps': 10,
-    #                               'dynamic_relaxation': 'on',
-    #                               'clean_up_previous_solution': 'on',
-    #                               'structural_solver': 'NonLinearDynamicPrescribedStep',
-    #                               'structural_solver_settings': settings['NonLinearDynamicPrescribedStep'],
-    #                               'aero_solver': 'StepUvlm',
-    #                               'aero_solver_settings': settings['StepUvlm'],
-    #                               'fsi_substeps': 200,
-    #                               'fsi_tolerance': 1e-6,
-    #                               'relaxation_factor': pazy.relaxation_factor,
-    #                               'minimum_steps': 1,
-    #                               'relaxation_steps': 150,
-    #                               'final_relaxation_factor': 0.0,
-    #                               'n_time_steps': 1,
-    #                               'dt': pazy.dt,
-    #                               'include_unsteady_force_contribution': 'off',
-    #                               'postprocessors': ['BeamPlot', 'AerogridPlot'],
-    #                               'postprocessors_settings': {'BeamLoads': {'folder': route_test_dir + output_folder,
-    #                                                                         'csv_output': 'off'},
-    #                                                           'BeamPlot': {'folder': route_test_dir + output_folder,
-    #                                                                        'include_rbm': 'on',
-    #                                                                        'include_applied_forces': 'on'},
-    #                                                           'StallCheck': {},
-    #                                                           'AerogridPlot': {
-    #                                                               'u_inf': pazy.u_inf,
-    #                                                               'folder': route_test_dir + output_folder,
-    #                                                               'include_rbm': 'on',
-    #                                                               'include_applied_forces': 'on',
-    #                                                               'minus_m_star': 0},
-    #                                                           'WriteVariablesTime': {
-    #                                                               'folder': route_test_dir + output_folder,
-    #                                                               'structure_variables': ['pos', 'psi'],
-    #                                                               'structure_nodes': [pazy.num_node_surf - 1,
-    #                                                                                   pazy.num_node_surf,
-    #                                                                                   pazy.num_node_surf + 1]
-    #
-    #                                                           }}}
-    #
-    # pazy.config['DynamicCoupled'] = settings['DynamicCoupled']
+    settings['DynamicCoupled'] = {'print_info': 'on',
+                                  'structural_substeps': 10,
+                                  'dynamic_relaxation': 'on',
+                                  'clean_up_previous_solution': 'on',
+                                  'structural_solver': 'NonLinearDynamicPrescribedStep',
+                                  'structural_solver_settings': settings['NonLinearDynamicPrescribedStep'],
+                                  'aero_solver': 'StepUvlm',
+                                  'aero_solver_settings': settings['StepUvlm'],
+                                  'fsi_substeps': 200,
+                                  'fsi_tolerance': 1e-6,
+                                  'relaxation_factor': 0.2,
+                                  'minimum_steps': 1,
+                                  'relaxation_steps': 150,
+                                  'final_relaxation_factor': 0.0,
+                                  'n_time_steps': 1,
+                                  'dt': dt,
+                                  'include_unsteady_force_contribution': 'off',
+                                  'postprocessors': [],
+                                  'postprocessors_settings': {'BeamLoads': {'folder': route_test_dir + output_folder,
+                                                                            'csv_output': 'off'},
+                                                              'BeamPlot': {'folder': route_test_dir + output_folder,
+                                                                           'include_rbm': 'on',
+                                                                           'include_applied_forces': 'on'},
+                                                              'StallCheck': {},
+                                                              'AerogridPlot': {
+                                                                  'u_inf': u_inf,
+                                                                  'folder': route_test_dir + output_folder,
+                                                                  'include_rbm': 'on',
+                                                                  'include_applied_forces': 'on',
+                                                                  'minus_m_star': 0},
+                                                            }}
+    
+    pazy.config['DynamicCoupled'] = settings['DynamicCoupled']
     pazy.config.write()
 
     sharpy.sharpy_main.main(['', pazy.case_route + '/' + pazy.case_name + '.sharpy'])
@@ -278,7 +273,7 @@ if __name__== '__main__':
     from datetime import datetime
     u_inf_vec = np.linspace(10, 90, 81)
 
-    alpha = 0.25
+    alpha = 1.0
     gravity_on = False
     skin_on = False
 
