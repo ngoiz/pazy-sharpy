@@ -2,6 +2,7 @@ import numpy as np
 import os
 import sharpy.sharpy_main
 from pazy_wing_model import PazyWing
+import sharpy.utils.algebra as algebra
 
 
 def generate_pazy(u_inf, case_name, output_folder='/output/', cases_subfolder='', **kwargs):
@@ -10,6 +11,7 @@ def generate_pazy(u_inf, case_name, output_folder='/output/', cases_subfolder=''
     rho = 1.225
     num_modes = 16
     gravity_on = kwargs.get('gravity_on', True)
+    skin_on = kwargs.get('skin_on', False)
 
     # Lattice Discretisation
     M = kwargs.get('M', 4)
@@ -49,14 +51,14 @@ def generate_pazy(u_inf, case_name, output_folder='/output/', cases_subfolder=''
              'AsymptoticStability',
              'SaveParametricCase',
              ],
-        'case': pazy.case_name, 'route': pazy.route,
+        'case': pazy.case_name, 'route': pazy.case_route,
         'write_screen': 'on', 'write_log': 'on',
         'log_folder': route_test_dir + output_folder + pazy.case_name + '/',
         'log_file': pazy.case_name + '.log'}
 
     pazy.config['BeamLoader'] = {
         'unsteady': 'off',
-        'orientation': pazy.quat}
+        'orientation': algebra.euler2quat([0., alpha_deg * np.pi / 180, 0])}
 
     pazy.config['AerogridLoader'] = {
         'unsteady': 'off',
@@ -107,6 +109,7 @@ def generate_pazy(u_inf, case_name, output_folder='/output/', cases_subfolder=''
             'rollup_dt': dt,
             'rollup_aic_refresh': 1,
             'rollup_tolerance': 1e-4,
+            'vortex_radius': 1e-10,
             'velocity_field_generator': 'SteadyVelocityField',
             'velocity_field_input': {
                 'u_inf': u_inf,
@@ -268,7 +271,7 @@ def generate_pazy(u_inf, case_name, output_folder='/output/', cases_subfolder=''
     # pazy.config['DynamicCoupled'] = settings['DynamicCoupled']
     pazy.config.write()
 
-    sharpy.sharpy_main.main(['', pazy.route + pazy.case_name + '.sharpy'])
+    sharpy.sharpy_main.main(['', pazy.case_route + '/' + pazy.case_name + '.sharpy'])
 
 
 if __name__== '__main__':
@@ -277,6 +280,7 @@ if __name__== '__main__':
 
     alpha = 0.25
     gravity_on = False
+    skin_on = False
 
     M = 16
     N = 1
@@ -292,12 +296,13 @@ if __name__== '__main__':
 
     for i, u_inf in enumerate(u_inf_vec):
         print('RUNNING SHARPY %f %f\n' % (alpha, u_inf))
-        case_name = 'pazi_uinf{:04g}_alpha{:04g}'.format(u_inf*10, alpha*100)
+        case_name = 'pazy_uinf{:04g}_alpha{:04g}'.format(u_inf*10, alpha*100)
         try:
-            generate_pazy(u_inf, case_name, output_folder='/output/pazy_M{:g}N{:g}Ms{:g}_alpha{:04g}/'.format(M, N, Ms, alpha*100),
-                          cases_subfolder='/M{:g}N{:g}Ms{:g}/'.format(M, N, Ms),
+            generate_pazy(u_inf, case_name, output_folder='/output/pazy_M{:g}N{:g}Ms{:g}_alpha{:04g}_skin{:g}/'.format(M, N, Ms, alpha*100, skin_on),
+                          cases_subfolder='/M{:g}N{:g}Ms{:g}_skin{:g}/'.format(M, N, Ms, skin_on),
                           M=M, N=N, Ms=Ms, alpha=alpha,
-                          gravity_on=gravity_on)
+                          gravity_on=gravity_on,
+                          skin_on=skin_on)
             now = datetime.now()
             dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
             with open('./{:s}.txt'.format(batch_log), 'a') as f:
