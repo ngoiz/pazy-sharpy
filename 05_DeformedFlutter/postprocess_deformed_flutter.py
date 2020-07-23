@@ -50,7 +50,7 @@ def save_eigenvalues(case):
 
 
 skin = False
-alpha_vec = np.array([0.5, 1, 2, 3])
+alpha_vec = np.array([0.25, 0.5, 1, 2, 3, 4, 5])
 sharpy_output_folder = './output/'
 output_folder = '../../pazy-aepw3-results/06_DeformedWingFlutter/' # place to save results
 
