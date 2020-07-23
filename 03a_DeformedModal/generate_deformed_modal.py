@@ -163,9 +163,9 @@ if __name__ == '__main__':
 
     u_inf_vec = np.linspace(1, 60, 60)
 
-    alpha = 7
+    alpha = 1
     gravity_on = False
-    skin_on = False
+    skin_on = True
 
     M = 16
     N = 64
