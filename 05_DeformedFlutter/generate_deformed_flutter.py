@@ -273,9 +273,9 @@ if __name__== '__main__':
     from datetime import datetime
     u_inf_vec = np.linspace(10, 90, 81)
 
-    alpha = 1.0
+    alpha = 5.0
     gravity_on = False
-    skin_on = False
+    skin_on = True
 
     M = 16
     N = 1
