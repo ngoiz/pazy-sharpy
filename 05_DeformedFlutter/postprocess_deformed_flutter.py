@@ -49,25 +49,25 @@ def save_eigenvalues(case):
                np.column_stack((flutter_speeds, deflection_flutter)))
 
 
-skin = True
-alpha_vec = np.array([0.5, 1, 2, 3, 4, 5])
-sharpy_output_folder = './output/'
-output_folder = '../../pazy-aepw3-results/06_DeformedWingFlutter/' # place to save results
+for skin in [True, False]:
+    alpha_vec = np.array([0.5, 1, 2, 3, 4, 5])
+    sharpy_output_folder = './output/'
+    output_folder = '../../pazy-aepw3-results/06_DeformedWingFlutter/' # place to save results
 
-if skin:
-    skin_str = 'skin_on'
-else:
-    skin_str = 'skin_off'
+    if skin:
+        skin_str = 'skin_on'
+    else:
+        skin_str = 'skin_off'
 
-output_folder += 'sharpy_{}/'.format(skin_str)
-os.makedirs(output_folder, exist_ok=True)
+    output_folder += 'sharpy_{}/'.format(skin_str)
+    os.makedirs(output_folder, exist_ok=True)
 
-flutter_case_name = 'deformed_flutter_{}'.format(skin)
+    flutter_case_name = 'deformed_flutter_{}'.format(skin)
 
-source_cases = ['pazy_M16N1Ms20_alpha{:04g}_skin{:g}'.format(alpha * 100, skin) for alpha in alpha_vec]
+    source_cases = ['pazy_M16N1Ms20_alpha{:04g}_skin{:g}'.format(alpha * 100, skin) for alpha in alpha_vec]
 
-results = prepare_cases_db(sharpy_output_folder, source_cases, alpha_vec)
+    results = prepare_cases_db(sharpy_output_folder, source_cases, alpha_vec)
 
-for case in results:
-    save_eigenvalues(case)
+    for case in results:
+        save_eigenvalues(case)
 
