@@ -215,7 +215,7 @@ if __name__ == '__main__':
     skin_on = False
 
     M = 16
-    N = 1  # michigan discretisation
+    N = 2  # michigan discretisation
     Ms = 10
 
     batch_log = 'batch_log_alpha{:04g}'.format(alpha * 100)
