@@ -42,6 +42,8 @@ def run_coupled_torsion_simulation(case_id, tip_load, skin_on, case_root='./case
                  'BeamPlot',
                  'WriteVariablesTime',
                  'AerogridPlot',
+                 'Modal',
+                 'SaveParametricCase'
                  ],
         'case': case_name, 'route': case_route,
         'write_screen': 'off', 'write_log': 'on',
@@ -105,6 +107,20 @@ def run_coupled_torsion_simulation(case_id, tip_load, skin_on, case_root='./case
                                    'include_rbm': 'off',
                                    'include_applied_forces': 'on',
                                    'minus_m_star': 0}
+
+    settings['Modal'] = {'folder': output_folder,
+                         'NumLambda': 20,
+                         'rigid_body_modes': 'off',
+                         'print_matrices': 'on',
+                         'keep_linear_matrices': 'off',
+                         'write_dat': 'on',
+                         'continuous_eigenvalues': 'off',
+                         'write_modes_vtk': 'on',
+                         'use_undamped_modes': 'on'}
+
+    settings['SaveParametricCase'] = {'folder': output_folder + pazy.case_name + '/',
+                                      'save_case': 'off',
+                                      'parameters': {'mass': tip_load}}
     for k, v in settings.items():
         config[k] = v
 
@@ -117,10 +133,9 @@ def run_coupled_torsion_simulation(case_id, tip_load, skin_on, case_root='./case
 
 if __name__ == '__main__':
     tip_load = np.linspace(0, 3.5, 25)
-    skin = 'on'
-
-    for case_id in range(len(tip_load)):
-        print('Running case {}, tip_load {}'.format(case_id, tip_load[case_id]))
-        run_coupled_torsion_simulation(case_id, tip_load[case_id], skin_on=skin,
-                                       case_root='./cases/skin_{}/'.format(skin),
-                                       output_folder='./output/skin_{}/'.format(skin))
+    for skin in ['on', 'off']:
+        for case_id in range(len(tip_load)):
+            print('Running case {}, skin {:s}, tip_load {}'.format(case_id, skin, tip_load[case_id]))
+            run_coupled_torsion_simulation(case_id, tip_load[case_id], skin_on=skin,
+                                           case_root='./cases/skin_{}/'.format(skin),
+                                           output_folder='./output/skin_{}/'.format(skin))
