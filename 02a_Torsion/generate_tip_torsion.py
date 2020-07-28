@@ -133,10 +133,9 @@ def run_coupled_torsion_simulation(case_id, tip_load, skin_on, case_root='./case
 
 if __name__ == '__main__':
     tip_load = np.linspace(0, 3.5, 25)
-    skin = 'off'
-
-    for case_id in range(len(tip_load)):
-        print('Running case {}, tip_load {}'.format(case_id, tip_load[case_id]))
-        run_coupled_torsion_simulation(case_id, tip_load[case_id], skin_on=skin,
-                                       case_root='./cases/skin_{}/'.format(skin),
-                                       output_folder='./output/skin_{}/'.format(skin))
+    for skin in ['on', 'off']:
+        for case_id in range(len(tip_load)):
+            print('Running case {}, skin {:s}, tip_load {}'.format(case_id, skin, tip_load[case_id]))
+            run_coupled_torsion_simulation(case_id, tip_load[case_id], skin_on=skin,
+                                           case_root='./cases/skin_{}/'.format(skin),
+                                           output_folder='./output/skin_{}/'.format(skin))
