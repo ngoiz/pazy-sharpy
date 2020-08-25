@@ -60,3 +60,4 @@ for skin in [True, False]:
         mode_data.append(np.array([freq[i_mode, 1] for freq in beam_frequencies]))
         np.savetxt(modal_output_folder + modal_case_output_folder + '/mode_{:02g}.txt'.format(i_mode//2),
                    np.column_stack((tip_mass, wing_tip_deflection, mode_data[i_mode//2])))
+    print('Saved data to {}'.format(modal_output_folder + modal_case_output_folder))

@@ -27,6 +27,7 @@ def run_coupled_bending_simulation(case_id, tip_load, skin_on, case_root='./case
     mid_chord_b = (pazy.get_ea_reference_line() - 0.5) * 0.1
 
     pazy.structure.app_forces[pazy.structure.n_node // 2, 2] = tip_load
+    pazy.structure.app_forces[pazy.structure.n_node // 2 + 1, 2] = tip_load
     pazy.save_files()
 
     # simulation settings
