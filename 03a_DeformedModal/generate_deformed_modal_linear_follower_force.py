@@ -27,9 +27,6 @@ def run_coupled_bending_simulation(case_id, tip_load, skin_on, case_root='./case
     pazy.structure.mirror_wing()
     pazy.generate_aero()
 
-    # Lumped mass
-    mid_chord_b = (pazy.get_ea_reference_line() - 0.5) * 0.1
-
     pazy.structure.app_forces[pazy.structure.n_node // 2, 2] = tip_load
     pazy.structure.app_forces[pazy.structure.n_node // 2 + 1, 2] = tip_load
     pazy.save_files()
@@ -69,8 +66,6 @@ def run_coupled_bending_simulation(case_id, tip_load, skin_on, case_root='./case
     settings['NonLinearStatic'] = {'print_info': 'off',
                                    'max_iterations': 900,
                                    'num_load_steps': 10,
-                                   # 'num_steps': 10,
-                                   # 'dt': 2.5e-4,
                                    'delta_curved': 1e-5,
                                    'min_delta': 1e-6,
                                    'gravity_on': 'off',
@@ -83,7 +78,7 @@ def run_coupled_bending_simulation(case_id, tip_load, skin_on, case_root='./case
         'n_load_steps': 4,
         'tolerance': 1e-5,
         'relaxation_factor': 0.1,
-        'aero_solver': 'StaticUvlm',
+        'aero_solver': 'NoAero',
         'aero_solver_settings': {
             'rho': 1e-8,
             'print_info': 'off',
@@ -124,40 +119,27 @@ def run_coupled_bending_simulation(case_id, tip_load, skin_on, case_root='./case
                          'write_modes_vtk': 'on',
                          'use_undamped_modes': 'on'}
 
-    settings['LinearAssembler'] = {'linear_system': 'LinearAeroelastic',
-                                      'linear_system_settings': {
-                                          'beam_settings': {'modal_projection': 'on',
-                                                            'inout_coords': 'modes',
-                                                            'discrete_time': 'on',
-                                                            'newmark_damp': 0.5e-6,
-                                                            'discr_method': 'newmark',
-                                                            'dt': dt,
-                                                            'proj_modes': 'undamped',
-                                                            'use_euler': 'off',
-                                                            'num_modes': num_modes,
-                                                            'print_info': 'off',
-                                                            'gravity': 'off',
-                                                            'remove_sym_modes': 'on',
-                                                            'remove_dofs': []},
-                                          'aero_settings': {'dt': dt,
-                                                            'integr_order': 1,
-                                                            'density': 1e-8,
-                                                            'remove_predictor': 'off',
-                                                            'use_sparse': 'on',
-                                                            'rigid_body_motion': 'off',
-                                                            'use_euler': 'off',
-                                                            'remove_inputs': ['u_gust'],
-                                                            'vortex_radius': 1e-10,
-                                                            },
-                                          'rigid_body_motion': False}
-                                      }
+    settings['LinearAssembler'] = {'linear_system': 'LinearBeam',
+                                   'linear_system_settings': {'modal_projection': 'on',
+                                                              'inout_coords': 'modes',
+                                                              'discrete_time': 'on',
+                                                              'newmark_damp': 0.5e-6,
+                                                              'discr_method': 'newmark',
+                                                              'dt': dt,
+                                                              'proj_modes': 'undamped',
+                                                              'use_euler': 'off',
+                                                              'num_modes': num_modes,
+                                                              'print_info': 'off',
+                                                              'gravity': 'off',
+                                                              'remove_sym_modes': 'on'}
+                                   }
 
-    settings['AsymptoticStability'] = {'print_info': True,
-                                          'folder': output_folder,
-                                          'export_eigenvalues': 'on',
-                                          'target_system': ['aeroelastic', 'structural'],
-                                          # 'velocity_analysis': [160, 180, 20]}
-                                          }
+    settings['AsymptoticStability'] = {'print_info': 'on',
+                                       'folder': output_folder,
+                                       'export_eigenvalues': 'on',
+                                       'target_system': ['aeroelastic', 'structural'],
+                                       }
+
     settings['SaveParametricCase'] = {'folder': output_folder + pazy.case_name + '/',
                                       'save_case': 'off',
                                       'parameters': {'mass': tip_load}}
