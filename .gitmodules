@@ -4,3 +4,6 @@
 [submodule "lib/sharpy"]
 	path = lib/sharpy
 	url = http://github.com/imperialcollegelondon/sharpy
+[submodule "lib/pazy-model"]
+	path = lib/pazy-model
+	url = http://github.com/ngoiz/pazy-model
