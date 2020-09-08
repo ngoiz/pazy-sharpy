@@ -145,8 +145,6 @@ cases/
 
 # SHARPy output files
 output/
-output*/
+figures/
 
 .DS_Store
-
-.idea/
