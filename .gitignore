@@ -23,6 +23,7 @@ share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+.idea/
 MANIFEST
 
 # PyInstaller
@@ -145,6 +146,7 @@ cases/
 
 # SHARPy output files
 output/
+output*/
 figures/
 
 .DS_Store
