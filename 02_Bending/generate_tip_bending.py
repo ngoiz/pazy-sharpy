@@ -114,6 +114,8 @@ def run_coupled_bending_simulation(case_id, tip_load, skin_on, case_root='./case
 
     pazy.structure.add_lumped_mass((tip_load, pazy.structure.n_node//2, np.zeros((3, 3)),
                                     np.array([0, mid_chord_b, 0])))
+    pazy.structure.add_lumped_mass((tip_load, pazy.structure.n_node//2 + 1, np.zeros((3, 3)),
+                                    np.array([0, mid_chord_b, 0])))
 
     pazy.save_files()
 
@@ -148,22 +150,22 @@ def run_coupled_bending_simulation(case_id, tip_load, skin_on, case_root='./case
                                        'dt': 0.1}}
 
     settings['NonLinearStatic'] = {'print_info': 'off',
-                                   'max_iterations': 900,
-                                   'num_load_steps': 10,
+                                   'max_iterations': 1000,
+                                   'num_load_steps': 12,
                                    # 'num_steps': 10,
                                    # 'dt': 2.5e-4,
                                    'delta_curved': 1e-5,
                                    'min_delta': 1e-6,
                                    'gravity_on': 'on',
-                                   'relaxation_factor': 0.,
+                                   'relaxation_factor': 0.1,
                                    'gravity': 9.81}
 
     settings['StaticCoupled'] = {
         'print_info': 'on',
         'max_iter': 200,
-        'n_load_steps': 4,
+        'n_load_steps': 8,
         'tolerance': 1e-5,
-        'relaxation_factor': 0.1,
+        'relaxation_factor': 0.2,
         'aero_solver': 'StaticUvlm',
         'aero_solver_settings': {
             'rho': 1e-8,
@@ -198,11 +200,11 @@ def run_coupled_bending_simulation(case_id, tip_load, skin_on, case_root='./case
     settings['Modal'] = {'folder': output_folder,
                          'NumLambda': 20,
                          'rigid_body_modes': 'off',
-                         'print_matrices': 'on',
+                         'print_matrices': 'off',
                          'keep_linear_matrices': 'off',
                          'write_dat': 'on',
                          'continuous_eigenvalues': 'off',
-                         'write_modes_vtk': 'on',
+                         'write_modes_vtk': 'off',
                          'use_undamped_modes': 'on'}
 
     settings['SaveParametricCase'] = {'folder': output_folder + pazy.case_name + '/',
@@ -219,11 +221,10 @@ def run_coupled_bending_simulation(case_id, tip_load, skin_on, case_root='./case
 
 
 if __name__ == '__main__':
-    tip_load = np.linspace(0, 3.5, 25)
-    skin = 'off'
-
-    for case_id in range(len(tip_load)):
-        print('Running case {}, tip_load {}'.format(case_id, tip_load[case_id]))
-        run_coupled_bending_simulation(case_id, tip_load[case_id], skin_on=skin,
-                                       case_root='./cases/skin_{}/'.format(skin),
-                                       output_folder='./output/skin_{}/'.format(skin))
+    tip_load = np.linspace(0, 3.5, 150)
+    for skin in ['on', 'off']:
+        for case_id in range(len(tip_load)):
+            print('Running case {}, tip_load {}'.format(case_id, tip_load[case_id]))
+            run_coupled_bending_simulation(case_id, tip_load[case_id], skin_on=skin,
+                                           case_root='./cases/skin_{}/'.format(skin),
+                                           output_folder='./output/skin_{}/'.format(skin))
