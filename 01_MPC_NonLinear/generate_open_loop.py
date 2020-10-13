@@ -43,10 +43,6 @@ def generate_pazy(u_inf, case_name, output_folder='/output/', cases_folder='', *
     ws.generate_aero_file()
     ws.generate_fem_file()
 
-    frequency_continuous_w = 2 * u_inf * frequency_continuous_k / ws.c_ref
-    rom_settings['frequency'] = frequency_continuous_w
-    rom_settings['tangent_input_file'] = ws.route + '/' + ws.case_name + '.rom.h5'
-
     ws.config['SHARPy'] = {
         'flow':
             ['BeamLoader',
@@ -90,6 +86,7 @@ def generate_pazy(u_inf, case_name, output_folder='/output/', cases_folder='', *
         'num_cores': 4,
         'n_rollup': 0,
         'rollup_aic_refresh': 0,
+        'vortex_radius': 1e-10,
         'rollup_tolerance': 1e-4}
 
     settings = dict()
@@ -121,7 +118,7 @@ def generate_pazy(u_inf, case_name, output_folder='/output/', cases_folder='', *
             'velocity_field_input': {
                 'u_inf': ws.u_inf,
                 'u_inf_direction': ws.u_inf_direction},
-            'vortex_radius': 1e-9},
+            'vortex_radius': 1e-10},
         'structural_solver': 'NonLinearStatic',
         'structural_solver_settings': settings['NonLinearStatic']}
 
@@ -174,7 +171,7 @@ def generate_pazy(u_inf, case_name, output_folder='/output/', cases_folder='', *
                                                      'u_inf_direction': [1., 0., 0.]},
                             'rho': ws.rho,
                             'n_time_steps': ws.n_tstep,
-                            'vortex_radius': 1e-9,
+                            'vortex_radius': 1e-10,
                             'dt': ws.dt,
                             'gamma_dot_filtering': 3}
 
@@ -196,21 +193,6 @@ def generate_pazy(u_inf, case_name, output_folder='/output/', cases_folder='', *
                                   'dt': ws.dt,
                                   'include_unsteady_force_contribution': 'on',
                                   'steps_without_unsteady_force': 2,
-                                  'network_settings': {'variables_filename': './variables_pazy.yaml',
-                                                       'byte_ordering': 'big',
-                                                       'input_network_settings': {'address': 'ae-ng213',
-                                                                                  'port': 65001},
-                                                       'output_network_settings': {'send_on_demand': False,
-                                                                                   # 'destination_address': ['127.0.0.1'],
-                                                                                   'address': 'ae-ng213',
-                                                                                   'port': 65000,
-                                                                                   # 'destination_address': ['155.198.41.179'],
-                                                                                   #'destination_address': ['ae-ng213'],
-                                                                                   'destination_address': ['ae-ma19515'],
-                                                                                   'destination_ports': [64015],
-                                                                                   # 'destination_ports': [64030],
-                                                                                   },
-                                                       },
                                   'postprocessors': ['AerogridPlot', 'BeamPlot', 'WriteVariablesTime'],
                                   'postprocessors_settings': {'BeamLoads': {'folder': output_folder,
                                                                             'csv_output': 'off'},
@@ -245,7 +227,7 @@ def generate_pazy(u_inf, case_name, output_folder='/output/', cases_folder='', *
 if __name__== '__main__':
     from datetime import datetime
 
-    u_inf_vec = [50]
+    u_inf_vec = [73]
 
     alpha = 4
     gravity_on = True
@@ -267,7 +249,7 @@ if __name__== '__main__':
         print('RUNNING SHARPY %f\n' % u_inf)
         case_name = 'pazy_uinf{:04g}_alpha{:04g}'.format(u_inf*10, alpha*100)
         try:
-            generate_pazy(u_inf, case_name, output_folder='./output/MPC_65001_wake3_M{:g}N{:g}Ms{:g}_alpha{:04g}/'.format(M, N, Ms, alpha*100),
+            generate_pazy(u_inf, case_name, output_folder='./output/OpenLoop_wake3_M{:g}N{:g}Ms{:g}_alpha{:04g}/'.format(M, N, Ms, alpha*100),
                           cases_folder='./cases/M{:g}N{:g}Ms{:g}wake3/'.format(M, N, Ms),
                           M=M, N=N, Ms=Ms, alpha=alpha,
                           gravity_on=gravity_on)
