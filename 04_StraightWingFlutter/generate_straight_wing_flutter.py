@@ -14,6 +14,7 @@ def generate_pazy(u_inf, case_name, output_folder='/output/', cases_subfolder=''
     num_modes = 16
     gravity_on = kwargs.get('gravity_on', True)
     skin_on = kwargs.get('skin_on', False)
+    trailing_edge_weight = kwargs.get('trailing_edge_weight', False)
 
     # Lattice Discretisation
     M = kwargs.get('M', 4)
@@ -34,8 +35,16 @@ def generate_pazy(u_inf, case_name, output_folder='/output/', cases_subfolder=''
                       'num_surfaces': 2}
 
     pazy = PazyWing(case_name=case_name, case_route=case_route, in_settings=model_settings)
-
     pazy.create_aeroelastic_model()
+
+    if trailing_edge_weight:
+        te_mass = 10e-3  # 10g
+        trailing_edge_b = (pazy.get_ea_reference_line() - 1.0) * 0.1
+        pazy.structure.add_lumped_mass((te_mass, pazy.structure.n_node//2, np.zeros((3, 3)),
+                                        np.array([0, trailing_edge_b, 0])))
+        pazy.structure.add_lumped_mass((te_mass, pazy.structure.n_node//2 + 1, np.zeros((3, 3)),
+                                        np.array([0, trailing_edge_b, 0])))
+
     pazy.save_files()
 
     u_inf_direction = np.array([1., 0., 0.])
@@ -212,11 +221,14 @@ if __name__ == '__main__':
     alpha = 0
     u_inf = 1
     gravity_on = False
-    skin_on = False
+    skin_on = True
 
     M = 16
-    N = 2  # michigan discretisation
+    N = 1  # michigan discretisation
     Ms = 10
+    # M = 6
+    # N = 2  # michigan discretisation
+    # Ms = 5
 
     batch_log = 'batch_log_alpha{:04g}'.format(alpha * 100)
 
@@ -231,13 +243,14 @@ if __name__ == '__main__':
     case_name = 'pazi_uinf{:04g}_alpha{:04g}'.format(u_inf * 10, alpha * 100)
     try:
         generate_pazy(u_inf, case_name,
-                      output_folder='/output/pazy_um{:g}N{:g}Ms{:g}_alpha{:04g}_skin{:g}/'.format(M, N, Ms,
+                      output_folder='/output/te_mass_pazy_um{:g}N{:g}Ms{:g}_alpha{:04g}_skin{:g}/'.format(M, N, Ms,
                                                                                                  alpha * 100,
                                                                                                  skin_on),
-                      cases_subfolder='/M{:g}N{:g}Ms{:g}/'.format(M, N, Ms),
+                      cases_subfolder='/te_massM{:g}N{:g}Ms{:g}/'.format(M, N, Ms),
                       M=M, N=N, Ms=Ms, alpha=alpha,
                       gravity_on=gravity_on,
-                      skin_on=skin_on)
+                      skin_on=skin_on,
+                      trailing_edge_weight=True)
         now = datetime.now()
         dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
     except AssertionError:
