@@ -12,6 +12,7 @@ def generate_pazy(u_inf, case_name, output_folder='/output/', cases_subfolder=''
     num_modes = 16
     gravity_on = kwargs.get('gravity_on', True)
     skin_on = kwargs.get('skin_on', False)
+    trailing_edge_weight = kwargs.get('trailing_edge_weight', False)
 
     # Lattice Discretisation
     M = kwargs.get('M', 4)
@@ -34,6 +35,13 @@ def generate_pazy(u_inf, case_name, output_folder='/output/', cases_subfolder=''
     pazy = PazyWing(case_name=case_name, case_route=case_route, in_settings=model_settings)
 
     pazy.create_aeroelastic_model()
+    if trailing_edge_weight:
+        te_mass = 10e-3  # 10g
+        trailing_edge_b = (pazy.get_ea_reference_line() - 1.0) * 0.1
+        pazy.structure.add_lumped_mass((te_mass, pazy.structure.n_node//2, np.zeros((3, 3)),
+                                        np.array([0, trailing_edge_b, 0])))
+        pazy.structure.add_lumped_mass((te_mass, pazy.structure.n_node//2 + 1, np.zeros((3, 3)),
+                                        np.array([0, trailing_edge_b, 0])))
     pazy.save_files()
 
     u_inf_direction = np.array([1., 0., 0.])
@@ -44,8 +52,8 @@ def generate_pazy(u_inf, case_name, output_folder='/output/', cases_subfolder=''
             ['BeamLoader',
              'AerogridLoader',
              'Modal',
-             'StaticUvlm',
-             # 'StaticCoupled',
+             # 'StaticUvlm',
+             'StaticCoupled',
              'AerogridPlot',
              'BeamPlot',
              # 'Modal',
@@ -115,7 +123,7 @@ def generate_pazy(u_inf, case_name, output_folder='/output/', cases_subfolder=''
             'rollup_dt': dt,
             'rollup_aic_refresh': 1,
             'rollup_tolerance': 1e-4,
-            'vortex_radius': 1e-10,
+            'vortex_radius': 1e-7,
             'velocity_field_generator': 'SteadyVelocityField',
             'velocity_field_input': {
                 'u_inf': u_inf,
@@ -197,7 +205,7 @@ def generate_pazy(u_inf, case_name, output_folder='/output/', cases_subfolder=''
                                                             'rigid_body_motion': 'off',
                                                             'use_euler': 'off',
                                                             'remove_inputs': ['u_gust'],
-                                                            'vortex_radius': 1e-10,
+                                                            'vortex_radius': 1e-8,
                                                             'rom_method': ['Krylov'],
                                                             'rom_method_settings':
                                                                 {'Krylov':
@@ -214,9 +222,9 @@ def generate_pazy(u_inf, case_name, output_folder='/output/', cases_subfolder=''
     pazy.config['AsymptoticStability'] = {'print_info': True,
                                           'folder': route_test_dir + output_folder,
                                           'export_eigenvalues': 'on',
-                                          'target_system': ['aeroelastic', 'aerodynamic', 'structural'],
+                                          # 'target_system': ['aeroelastic', 'aerodynamic', 'structural'],
                                           # 'velocity_analysis': [160, 180, 20]}
-                                          'modes_to_plot': [0, 1, 2, 3, 4, 5, 6, 8, 10, 12, 14],
+                                          # 'modes_to_plot': [0, 1, 2, 3, 4, 5, 6, 8, 10, 12, 14],
                                           }
 
     pazy.config['SaveParametricCase'] = {'folder': route_test_dir + output_folder + pazy.case_name + '/',
@@ -290,10 +298,11 @@ def generate_pazy(u_inf, case_name, output_folder='/output/', cases_subfolder=''
 
 if __name__== '__main__':
     from datetime import datetime
-    u_inf_vec = [50]
-    alpha = 10.0
+    u_inf_vec = [51]
+    alpha = 5.0
     gravity_on = False
     skin_on = True
+    trailing_edge_weight = True
 
     M = 16
     N = 2

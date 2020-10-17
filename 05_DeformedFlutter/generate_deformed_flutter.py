@@ -12,6 +12,7 @@ def generate_pazy(u_inf, case_name, output_folder='/output/', cases_subfolder=''
     num_modes = 16
     gravity_on = kwargs.get('gravity_on', True)
     skin_on = kwargs.get('skin_on', False)
+    trailing_edge_weight = kwargs.get('trailing_edge_weight', False)
 
     # Lattice Discretisation
     M = kwargs.get('M', 4)
@@ -33,6 +34,13 @@ def generate_pazy(u_inf, case_name, output_folder='/output/', cases_subfolder=''
     pazy = PazyWing(case_name=case_name, case_route=case_route, in_settings=model_settings)
 
     pazy.create_aeroelastic_model()
+    if trailing_edge_weight:
+        te_mass = 10e-3  # 10g
+        trailing_edge_b = (pazy.get_ea_reference_line() - 1.0) * 0.1
+        pazy.structure.add_lumped_mass((te_mass, pazy.structure.n_node//2, np.zeros((3, 3)),
+                                        np.array([0, trailing_edge_b, 0])))
+        pazy.structure.add_lumped_mass((te_mass, pazy.structure.n_node//2 + 1, np.zeros((3, 3)),
+                                        np.array([0, trailing_edge_b, 0])))
     pazy.save_files()
 
     u_inf_direction = np.array([1., 0., 0.])
@@ -41,12 +49,12 @@ def generate_pazy(u_inf, case_name, output_folder='/output/', cases_subfolder=''
     pazy.config['SHARPy'] = {
         'flow':
             ['BeamLoader',
-            'AerogridLoader',
+             'AerogridLoader',
              'StaticCoupled',
              'AerogridPlot',
              'BeamPlot',
              'WriteVariablesTime',
-             'DynamicCoupled',
+             # 'DynamicCoupled',
              'Modal',
              'LinearAssembler',
              'AsymptoticStability',
@@ -110,7 +118,7 @@ def generate_pazy(u_inf, case_name, output_folder='/output/', cases_subfolder=''
             'rollup_dt': dt,
             'rollup_aic_refresh': 1,
             'rollup_tolerance': 1e-4,
-            'vortex_radius': 1e-10,
+            'vortex_radius': 1e-7,
             'velocity_field_generator': 'SteadyVelocityField',
             'velocity_field_input': {
                 'u_inf': u_inf,
@@ -179,7 +187,7 @@ def generate_pazy(u_inf, case_name, output_folder='/output/', cases_subfolder=''
                                                             'rigid_body_motion': 'off',
                                                             'use_euler': 'off',
                                                             'remove_inputs': ['u_gust'],
-                                                            'vortex_radius': 1e-10,
+                                                            'vortex_radius': 1e-8,
                                                             'rom_method': ['Krylov'],
                                                             'rom_method_settings':
                                                                 {'Krylov':
@@ -201,8 +209,9 @@ def generate_pazy(u_inf, case_name, output_folder='/output/', cases_subfolder=''
                                         }
 
     pazy.config['SaveParametricCase'] = {'folder': route_test_dir + output_folder + pazy.case_name + '/',
-                                       'save_case': 'off',
-                                       'parameters': {'u_inf': u_inf}}
+                                         'save_case': 'off',
+                                         'parameters': {'u_inf': u_inf}}
+
     settings = dict()
     settings['NonLinearDynamicPrescribedStep'] = {'print_info': 'on',
                                                   'max_iterations': 950,
@@ -275,7 +284,8 @@ if __name__== '__main__':
 
     alpha = 5.0
     gravity_on = False
-    skin_on = True
+    skin_on = False
+    trailing_edge_weight = True
 
     M = 16
     N = 1
@@ -293,11 +303,15 @@ if __name__== '__main__':
         print('RUNNING SHARPY %f %f\n' % (alpha, u_inf))
         case_name = 'pazy_uinf{:04g}_alpha{:04g}'.format(u_inf*10, alpha*100)
         try:
-            generate_pazy(u_inf, case_name, output_folder='/output/pazy_M{:g}N{:g}Ms{:g}_alpha{:04g}_skin{:g}/'.format(M, N, Ms, alpha*100, skin_on),
-                          cases_subfolder='/M{:g}N{:g}Ms{:g}_skin{:g}/'.format(M, N, Ms, skin_on),
+            generate_pazy(u_inf, case_name,
+                          output_folder='/output/pazy_M{:g}N{:g}Ms{:g}_alpha{:04g}_skin{:g}_te{:g}/'.format(
+                              M, N, Ms, alpha*100, skin_on, trailing_edge_weight),
+                          cases_subfolder='/M{:g}N{:g}Ms{:g}_skin{:g}_te{:g}/'.format(
+                              M, N, Ms, skin_on, trailing_edge_weight),
                           M=M, N=N, Ms=Ms, alpha=alpha,
                           gravity_on=gravity_on,
-                          skin_on=skin_on)
+                          skin_on=skin_on,
+                          trailing_edge_weight=trailing_edge_weight)
             now = datetime.now()
             dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
             with open('./{:s}.txt'.format(batch_log), 'a') as f:
