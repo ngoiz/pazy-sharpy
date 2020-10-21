@@ -54,7 +54,7 @@ def generate_pazy(u_inf, case_name, output_folder='/output/', cases_subfolder=''
              'AerogridPlot',
              'BeamPlot',
              'WriteVariablesTime',
-             # 'DynamicCoupled',
+             'DynamicCoupled',
              'Modal',
              'LinearAssembler',
              'AsymptoticStability',
@@ -177,9 +177,9 @@ def generate_pazy(u_inf, case_name, output_folder='/output/', cases_subfolder=''
                                                             'remove_sym_modes': 'on',
                                                             'remove_dofs': []},
                                           'aero_settings': {'dt': dt,
-#                                                             'ScalingDict': {'length': 0.5 * pazy.aero.main_chord,
-#                                                                             'speed': u_inf,
-#                                                                             'density': rho},
+                                                            'ScalingDict': {'length': 0.5 * pazy.aero.main_chord,
+                                                                            'speed': u_inf,
+                                                                            'density': rho},
                                                             'integr_order': 2,
                                                             'density': rho,
                                                             'remove_predictor': 'off',
@@ -202,11 +202,11 @@ def generate_pazy(u_inf, case_name, output_folder='/output/', cases_subfolder=''
                                       }
 
     pazy.config['AsymptoticStability'] = {'print_info': True,
-                                        'folder': route_test_dir + output_folder,
-                                        'export_eigenvalues': 'on',
-                                        'target_system': ['aeroelastic', 'aerodynamic', 'structural'],
-                                        # 'velocity_analysis': [160, 180, 20]}
-                                        }
+                                          'folder': route_test_dir + output_folder,
+                                          'export_eigenvalues': 'on',
+                                          'target_system': ['aeroelastic', 'aerodynamic', 'structural'],
+                                          'reference_velocity': u_inf,
+                                          }
 
     pazy.config['SaveParametricCase'] = {'folder': route_test_dir + output_folder + pazy.case_name + '/',
                                          'save_case': 'off',
@@ -281,10 +281,11 @@ def generate_pazy(u_inf, case_name, output_folder='/output/', cases_subfolder=''
 if __name__== '__main__':
     from datetime import datetime
     u_inf_vec = np.linspace(10, 90, 81)
+    u_inf_vec = [83]
 
-    alpha = 5.0
+    alpha = 0.25
     gravity_on = False
-    skin_on = False
+    skin_on = True
     trailing_edge_weight = True
 
     M = 16
