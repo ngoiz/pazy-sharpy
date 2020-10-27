@@ -1,0 +1,5 @@
+SHARPy launch - START
+date and time = 17/10/2020 18:36:59
+
+17/10/2020 18:38:53 Ran case 0 :::: u_inf = 10.000000
+

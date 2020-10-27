@@ -54,7 +54,7 @@ def generate_pazy(u_inf, case_name, output_folder='/output/', cases_subfolder=''
              'AerogridPlot',
              'BeamPlot',
              'WriteVariablesTime',
-             'DynamicCoupled',
+             # 'DynamicCoupled',
              'Modal',
              'LinearAssembler',
              'AsymptoticStability',
