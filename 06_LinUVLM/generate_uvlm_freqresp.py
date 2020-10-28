@@ -52,6 +52,7 @@ def generate_pazy(u_inf, case_name, output_folder='/output/', cases_subfolder=''
              'FrequencyResponse',
              'AsymptoticStability',
              'SaveParametricCase',
+             # 'SaveData'
              ],
         'case': pazy.case_name, 'route': pazy.case_route,
         'write_screen': 'on', 'write_log': 'on',
@@ -170,9 +171,9 @@ def generate_pazy(u_inf, case_name, output_folder='/output/', cases_subfolder=''
                                                             'remove_sym_modes': 'on',
                                                             'remove_dofs': []},
                                           'aero_settings': {'dt': dt,
-#                                                             'ScalingDict': {'length': 0.5 * pazy.aero.main_chord,
-#                                                                             'speed': u_inf,
-#                                                                             'density': rho},
+                                                            'ScalingDict': {'length': 0.5 * pazy.aero.main_chord,
+                                                                            'speed': u_inf,
+                                                                            'density': rho},
                                                             'integr_order': 2,
                                                             'density': rho,
                                                             'remove_predictor': 'off',
@@ -180,7 +181,7 @@ def generate_pazy(u_inf, case_name, output_folder='/output/', cases_subfolder=''
                                                             'rigid_body_motion': 'off',
                                                             'use_euler': 'off',
                                                             'remove_inputs': ['u_gust'],
-                                                            'vortex_radius': 1e-10,
+                                                            'vortex_radius': 1e-7,
                                                             'rom_method': ['Krylov'],
                                                             'rom_method_settings':
                                                                 {'Krylov':
@@ -205,7 +206,7 @@ def generate_pazy(u_inf, case_name, output_folder='/output/', cases_subfolder=''
                                         'folder': route_test_dir + output_folder,
                                         'target_system': ['aeroelastic', 'aerodynamic', 'structural'],
                                         'quick_plot': 'off',
-                                        'frequency_unit': 'k',
+                                        'frequency_unit': 'w',
                                         'frequency_bounds': [1e-3, 0.1],
                                         'frequency_scaling': {'length': 0.5 * pazy.aero.main_chord,
                                                               'speed': u_inf}}
@@ -275,6 +276,14 @@ def generate_pazy(u_inf, case_name, output_folder='/output/', cases_subfolder=''
                                                             }}
     
     pazy.config['DynamicCoupled'] = settings['DynamicCoupled']
+
+    pazy.config['SaveData'] = {'folder': route_test_dir + output_folder,
+                               'save_aero': 'off',
+                               'save_struct': 'off',
+                               'save_linear': 'on',
+                               'save_linear_uvlm': 'on',
+                               'format': 'mat'}
+
     pazy.config.write()
 
     sharpy.sharpy_main.main(['', pazy.case_route + '/' + pazy.case_name + '.sharpy'])
@@ -284,8 +293,9 @@ if __name__== '__main__':
     from datetime import datetime
     # u_inf_vec = np.linspace(10, 90, 81)
 
-    u_inf_vec = np.linspace(30, 60, 7)
-    alpha = 5.0
+    u_inf_vec = np.linspace(20, 60, 5)
+    u_inf_vec = [1]
+    alpha = 0.0
     gravity_on = False
     skin_on = True
 
