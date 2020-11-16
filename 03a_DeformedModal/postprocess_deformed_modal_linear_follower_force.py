@@ -24,13 +24,13 @@ if not os.path.isdir(output_folder):
 
 for skin in [True, False]:
     if skin:
-        sharpy_case_name = 'test_followerforce_LB_FF_skin_on'
+        sharpy_case_name = 'followerforce_LAS_FF_skin_on'
         skin_wo = 'w'
     else:
-        sharpy_case_name = 'test_followerforce_LB_FF_skin_off'
+        sharpy_case_name = 'followerforce_LAS_FF_skin_off'
         skin_wo = 'wo'
 
-    modal_case_output_folder = 'sharpy_followerforce_LB_FF_skin{:g}'.format(skin)
+    modal_case_output_folder = 'sharpy_followerforce_LAS_FF_skin{:g}'.format(skin)
 
     dataset = Actual(sharpy_output_folder + sharpy_case_name + '/*')
 

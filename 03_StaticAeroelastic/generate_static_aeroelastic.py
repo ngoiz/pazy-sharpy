@@ -252,50 +252,52 @@ if __name__ == '__main__':
     # u_inf_vec = [50]
     #     u_inf_vec = np.linspace(20, 60, 41)
     #     u_inf_vec = np.linspace(1, 20, 20)
-    u_inf_vec = np.linspace(1, 60, 60)
+    u_inf_vec = np.linspace(1, 80, 80)
 
-    alpha = 5
+#     alpha = 5
     gravity_on = False
-    skin_on = True
+#     skin_on = True
+    for alpha in [5., 7.]:
+        for skin_on in [True, False]:
 
-    M = 16
-    N = 64
-    Ms = 1
+            M = 16
+            N = 64
+            Ms = 1
 
-    # For comparison with Marc
-    #     M = 8
-    #     N = 128
-    #     Ms = 8
+            # For comparison with Marc
+            #     M = 8
+            #     N = 128
+            #     Ms = 8
 
-    batch_log = 'batch_log_alpha{:04g}'.format(alpha * 100)
+            batch_log = 'batch_log_alpha{:04g}'.format(alpha * 100)
 
-    with open('./{:s}.txt'.format(batch_log), 'w') as f:
-        # dd/mm/YY H:M:S
-        now = datetime.now()
-        dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
-        f.write('SHARPy launch - START\n')
-        f.write("date and time = %s\n\n" % dt_string)
+            with open('./{:s}.txt'.format(batch_log), 'w') as f:
+                # dd/mm/YY H:M:S
+                now = datetime.now()
+                dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
+                f.write('SHARPy launch - START\n')
+                f.write("date and time = %s\n\n" % dt_string)
 
-    for i, u_inf in enumerate(u_inf_vec):
-        print('RUNNING SHARPY %f\n' % u_inf)
-        case_name = 'pazi_uinf{:04g}_alpha{:04g}'.format(u_inf * 10, alpha * 100)
-        try:
-            generate_pazy(u_inf, case_name,
-                          output_folder='/output/pazy_um1{:g}N{:g}Ms{:g}_alpha{:04g}_skin{}/'.format(M, N, Ms,
-                                                                                                     alpha * 100,
-                                                                                                     skin_on),
-                          cases_subfolder='/M{:g}N{:g}Ms{:g}/'.format(M, N, Ms),
-                          M=M, N=N, Ms=Ms, alpha=alpha,
-                          gravity_on=gravity_on,
-                          skin_on=skin_on)
-            now = datetime.now()
-            dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
-            with open('./{:s}.txt'.format(batch_log), 'a') as f:
-                f.write('%s Ran case %i :::: u_inf = %f\n\n' % (dt_string, i, u_inf))
-        except AssertionError:
-            now = datetime.now()
-            dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
-            with open('./{:s}.txt'.format(batch_log), 'a') as f:
-                f.write('%s ERROR RUNNING case %f\n\n' % (dt_string, u_inf))
+            for i, u_inf in enumerate(u_inf_vec):
+                print('RUNNING SHARPY %f\n' % u_inf)
+                case_name = 'pazi_uinf{:04g}_alpha{:04g}'.format(u_inf * 10, alpha * 100)
+                try:
+                    generate_pazy(u_inf, case_name,
+                                  output_folder='/output/pazy_um1{:g}N{:g}Ms{:g}_alpha{:04g}_skin{}/'.format(M, N, Ms,
+                                                                                                             alpha * 100,
+                                                                                                             skin_on),
+                                  cases_subfolder='/M{:g}N{:g}Ms{:g}/'.format(M, N, Ms),
+                                  M=M, N=N, Ms=Ms, alpha=alpha,
+                                  gravity_on=gravity_on,
+                                  skin_on=skin_on)
+                    now = datetime.now()
+                    dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
+                    with open('./{:s}.txt'.format(batch_log), 'a') as f:
+                        f.write('%s Ran case %i :::: u_inf = %f\n\n' % (dt_string, i, u_inf))
+                except AssertionError:
+                    now = datetime.now()
+                    dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
+                    with open('./{:s}.txt'.format(batch_log), 'a') as f:
+                        f.write('%s ERROR RUNNING case %f\n\n' % (dt_string, u_inf))
 
 
