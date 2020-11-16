@@ -26,7 +26,7 @@ def save_frequency_data(actual_case):
         wv = case.bode.wv
 
         nout, nin = case.bode.ss0.shape
-        case_name = 'sharpy_uinf{:04g}_{:s}'.format(case.parameter_value, 'aero')
+        case_name = 'sharpy_uinf{:04g}_{:s}_skin{:g}'.format(case.parameter_value, 'aero', 0)
         os.makedirs(postprocess_output + '/' + case_name, exist_ok=True)
         for i_out in range(nout):
             for i_in in range(nin):
@@ -34,14 +34,14 @@ def save_frequency_data(actual_case):
                 np.savetxt(postprocess_output + '/' + case_name + '/in{:02g}_out{:02g}.txt'.format(i_in, i_out), res)
 #######################
 # INPUTS
-sharpy_output_directory = './output/test_pazy_M16N1Ms16_alpha0500_skin1/'
+sharpy_output_directory = './output/test_pazy_M16N1Ms16_alpha0000_skin1/'
 postprocess_output = './output/postprocess/'
 
 #######################
-if os.path.isdir(postprocess_output):
-    shutil.rmtree(postprocess_output)
+# if os.path.isdir(postprocess_output):
+#     shutil.rmtree(postprocess_output)
 
-os.makedirs(postprocess_output)
+# os.makedirs(postprocess_output)
 
 src_cases = glob.glob(sharpy_output_directory)
 

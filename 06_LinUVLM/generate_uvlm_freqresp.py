@@ -171,9 +171,9 @@ def generate_pazy(u_inf, case_name, output_folder='/output/', cases_subfolder=''
                                                             'remove_sym_modes': 'on',
                                                             'remove_dofs': []},
                                           'aero_settings': {'dt': dt,
-                                                            'ScalingDict': {'length': 0.5 * pazy.aero.main_chord,
-                                                                            'speed': u_inf,
-                                                                            'density': rho},
+#                                                             'ScalingDict': {'length': 0.5 * pazy.aero.main_chord,
+#                                                                             'speed': u_inf,
+#                                                                             'density': rho},
                                                             'integr_order': 2,
                                                             'density': rho,
                                                             'remove_predictor': 'off',
@@ -205,11 +205,12 @@ def generate_pazy(u_inf, case_name, output_folder='/output/', cases_subfolder=''
     pazy.config['FrequencyResponse'] = {'print_info': 'on',
                                         'folder': route_test_dir + output_folder,
                                         'target_system': ['aeroelastic', 'aerodynamic', 'structural'],
-                                        'quick_plot': 'off',
+                                        'quick_plot': 'on',
                                         'frequency_unit': 'w',
-                                        'frequency_bounds': [1e-3, 0.1],
-                                        'frequency_scaling': {'length': 0.5 * pazy.aero.main_chord,
-                                                              'speed': u_inf}}
+                                        'frequency_bounds': [1e-3, np.pi/dt],
+#                                         'frequency_scaling': {'length': 0.5 * pazy.aero.main_chord,
+#                                                               'speed': u_inf}
+                                       }
 
     pazy.config['SaveParametricCase'] = {'folder': route_test_dir + output_folder + pazy.case_name + '/',
                                        'save_case': 'off',
@@ -294,10 +295,10 @@ if __name__== '__main__':
     # u_inf_vec = np.linspace(10, 90, 81)
 
     u_inf_vec = np.linspace(20, 60, 5)
-    u_inf_vec = [1]
+    u_inf_vec = [10]
     alpha = 0.0
     gravity_on = False
-    skin_on = True
+    skin_on = False
 
     M = 16
     N = 1
@@ -318,8 +319,8 @@ if __name__== '__main__':
         print('RUNNING SHARPY %f %f\n' % (alpha, u_inf))
         case_name = 'pazy_uinf{:04g}_alpha{:04g}'.format(u_inf*10, alpha*100)
         try:
-            generate_pazy(u_inf, case_name, output_folder='/output/test_pazy_M{:g}N{:g}Ms{:g}_alpha{:04g}_skin{:g}/'.format(M, N, Ms, alpha*100, skin_on),
-                          cases_subfolder='/test_M{:g}N{:g}Ms{:g}_skin{:g}/'.format(M, N, Ms, skin_on),
+            generate_pazy(u_inf, case_name, output_folder='/output/test_single_nyquist_pazy_M{:g}N{:g}Ms{:g}_alpha{:04g}_skin{:g}/'.format(M, N, Ms, alpha*100, skin_on),
+                          cases_subfolder='/test_single_M{:g}N{:g}Ms{:g}_skin{:g}/'.format(M, N, Ms, skin_on),
                           M=M, N=N, Ms=Ms, alpha=alpha,
                           gravity_on=gravity_on,
                           skin_on=skin_on)
