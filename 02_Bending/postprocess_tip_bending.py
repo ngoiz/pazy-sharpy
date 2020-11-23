@@ -52,7 +52,7 @@ for skin in [True, False]:
     beam_frequencies = [beam_frequencies[i] for i in order]
 
     # save bending data z displacement only
-    np.savetxt(bending_output_folder + '/sharpy_bending_{}_skin.txt'.format(skin_wo),
+    np.savetxt(bending_output_folder + '/bending_sharpy_{}_skin.txt'.format(skin_wo),
                np.column_stack((tip_mass, wing_tip_deflection)))
 
     mode_data = []
