@@ -7,6 +7,8 @@ import numpy as np
 import shutil
 import sharpy.utils.algebra as algebra
 
+alpha = 0
+
 def prepare_cases_db(sharpy_output_folder, source_cases, param_vec):
     cases_db = []
 
@@ -26,7 +28,7 @@ def save_frequency_data(actual_case):
         wv = case.bode.wv
 
         nout, nin = case.bode.ss0.shape
-        case_name = 'sharpy_uinf{:04g}_{:s}_skin{:g}'.format(case.parameter_value, 'aero', 0)
+        case_name = 'sharpy_alpha{:04g}_uinf{:04g}_{:s}_skin{:g}'.format(alpha * 100, case.parameter_value, 'aero', 0)
         os.makedirs(postprocess_output + '/' + case_name, exist_ok=True)
         for i_out in range(nout):
             for i_in in range(nin):
@@ -34,8 +36,8 @@ def save_frequency_data(actual_case):
                 np.savetxt(postprocess_output + '/' + case_name + '/in{:02g}_out{:02g}.txt'.format(i_in, i_out), res)
 #######################
 # INPUTS
-sharpy_output_directory = './output/test_pazy_M16N1Ms16_alpha0000_skin1/'
-postprocess_output = './output/postprocess/'
+sharpy_output_directory = './output/pazy_M6N1Ms5_alpha{:04g}_skin0/'.format(alpha * 100)
+postprocess_output = './output/postprocess_coarse/'
 
 #######################
 # if os.path.isdir(postprocess_output):

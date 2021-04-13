@@ -177,7 +177,7 @@ def generate_pazy(u_inf, case_name, output_folder='/output/', cases_subfolder=''
                                                             'integr_order': 2,
                                                             'density': rho,
                                                             'remove_predictor': 'off',
-                                                            'use_sparse': 'on',
+                                                            'use_sparse': 'off',
                                                             'rigid_body_motion': 'off',
                                                             'use_euler': 'off',
                                                             'remove_inputs': ['u_gust'],
@@ -207,7 +207,8 @@ def generate_pazy(u_inf, case_name, output_folder='/output/', cases_subfolder=''
                                         'target_system': ['aeroelastic', 'aerodynamic', 'structural'],
                                         'quick_plot': 'on',
                                         'frequency_unit': 'w',
-                                        'frequency_bounds': [1e-3, np.pi/dt],
+#                                         'frequency_bounds': [1e-3, np.pi/dt],
+                                        'frequency_bounds': [1e-3, 2 * u_inf / 0.1],
 #                                         'frequency_scaling': {'length': 0.5 * pazy.aero.main_chord,
 #                                                               'speed': u_inf}
                                        }
@@ -295,17 +296,17 @@ if __name__== '__main__':
     # u_inf_vec = np.linspace(10, 90, 81)
 
     u_inf_vec = np.linspace(20, 60, 5)
-    u_inf_vec = [10]
-    alpha = 0.0
+#     u_inf_vec = [10]
+    alpha = 1.0
     gravity_on = False
     skin_on = False
 
     M = 16
     N = 1
     Ms = 16
-    # M = 6
-    # N = 1
-    # Ms = 5
+    M = 6
+    N = 1
+    Ms = 5
 
     batch_log = 'batch_log_alpha{:04g}'.format(alpha*100)
 
@@ -319,8 +320,8 @@ if __name__== '__main__':
         print('RUNNING SHARPY %f %f\n' % (alpha, u_inf))
         case_name = 'pazy_uinf{:04g}_alpha{:04g}'.format(u_inf*10, alpha*100)
         try:
-            generate_pazy(u_inf, case_name, output_folder='/output/test_single_nyquist_pazy_M{:g}N{:g}Ms{:g}_alpha{:04g}_skin{:g}/'.format(M, N, Ms, alpha*100, skin_on),
-                          cases_subfolder='/test_single_M{:g}N{:g}Ms{:g}_skin{:g}/'.format(M, N, Ms, skin_on),
+            generate_pazy(u_inf, case_name, output_folder='/output/pazy_M{:g}N{:g}Ms{:g}_alpha{:04g}_skin{:g}/'.format(M, N, Ms, alpha*100, skin_on),
+                          cases_subfolder='/pazy_M{:g}N{:g}Ms{:g}_skin{:g}/'.format(M, N, Ms, skin_on),
                           M=M, N=N, Ms=Ms, alpha=alpha,
                           gravity_on=gravity_on,
                           skin_on=skin_on)
