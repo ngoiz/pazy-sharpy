@@ -1,22 +1,13 @@
 {
-  "metadata": {
-    "license": {
-      "id": "other-open"
-    }, 
-    "title": "SHARPy simulation and post-processing scripts for the Pazy Wing model 1", 
+    "license": "other-open", 
+    "title": "SHARPy simulation and post-processing scripts for the Pre-Pazy Wing Model", 
+    "upload_type": "software", 
     "creators": [
-      {
-        "orcid": "0000-0001-7445-5970", 
-        "affiliation": "Imperial College London", 
-        "name": "Norberto Goizueta"
-      }
+        {
+            "orcid": "0000-0001-7445-5970", 
+            "affiliation": "Imperial College London", 
+            "name": "Norberto Goizueta"
+        }
     ], 
     "access_right": "open", 
-    "resource_type": {
-      "type": "software", 
-      "title": "Software"
-    }, 
-      }
-    ]
-  }
 }
