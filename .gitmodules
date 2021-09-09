@@ -7,3 +7,6 @@
 [submodule "lib/pazy-model"]
 	path = lib/pazy-model
 	url = http://github.com/ngoiz/pazy-model
+[submodule "lib/interpolation"]
+    path = lib/interpolation
+	url = http://github.com/ngoiz/interpolation
